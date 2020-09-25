@@ -1989,9 +1989,32 @@ EasyMDE.prototype.render = function (el) {
             codeMirrorInstance: CodeMirror,
         });
     } else {
+
+        this.codemirror.defineSimpleMode('simplemode', {
+            // The start state contains the rules that are intially used
+            start: [
+                {regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i,
+                token: 'number'},
+            ],
+            // The meta property contains global information about the mode. It
+            // can contain properties like lineComment, which are supported by
+            // all modes, and also directives like dontIndentStates, which are
+            // specific to simple modes.
+            meta: {
+                dontIndentStates: ['comment'],
+                lineComment: '//',
+            },
+        });
+
         mode = options.parsingConfig;
         mode.name = 'gfm';
         mode.gitHubSpice = false;
+        
+
+        backdrop = options.parsingConfig;
+        backdrop.name = 'simplemode';
+        backdrop.gitHubSpice = false;
+        
     }
 
     // eslint-disable-next-line no-unused-vars
