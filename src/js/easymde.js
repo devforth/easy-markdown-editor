@@ -1979,7 +1979,25 @@ EasyMDE.prototype.render = function (el) {
     document.addEventListener('keydown', this.documentOnKeyDown, false);
 
     var mode, backdrop;
-    if (options.spellChecker !== false) {
+
+    // CodeMirror overlay mode
+    if (options.overlayMode) {
+      CodeMirror.defineMode('overlay-mode', function(config) {
+        return CodeMirror.overlayMode(CodeMirror.getMode(config, options.spellChecker !== false ? 'spell-checker' : 'gfm'), options.overlayMode.mode, options.overlayMode.combine);
+      });
+      
+      mode = 'overlay-mode';
+      backdrop = options.parsingConfig;
+      backdrop.gitHubSpice = false;
+
+      if (options.spellChecker !== false) {
+        backdrop.name = 'gfm';
+
+        CodeMirrorSpellChecker({
+          codeMirrorInstance: CodeMirror,
+        });
+
+      } else if (options.spellChecker !== false) {
         mode = 'spell-checker';
         backdrop = options.parsingConfig;
         backdrop.name = 'gfm';
@@ -1988,16 +2006,11 @@ EasyMDE.prototype.render = function (el) {
         CodeMirrorSpellChecker({
             codeMirrorInstance: CodeMirror,
         });
+      }
     } else {
         mode = options.parsingConfig;
         mode.name = 'gfm';
         mode.gitHubSpice = false;
-        
-
-        backdrop = options.parsingConfig;
-        backdrop.name = 'simplemode';
-        backdrop.gitHubSpice = false;
-        
     }
 
     // eslint-disable-next-line no-unused-vars
@@ -2064,7 +2077,7 @@ EasyMDE.prototype.render = function (el) {
             }, self.options.autosave.submit_delay || self.options.autosave.delay || 1000);
         });
     }
-    
+
 
     function handleImages() {
         if (options.previewImagesInEditor === false) {
@@ -2107,7 +2120,7 @@ EasyMDE.prototype.render = function (el) {
         handleImages();
     });
 
-    
+
 
     this.onWindowResize = function() {
         handleImages();
